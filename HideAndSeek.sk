@@ -1,0 +1,158 @@
+options:
+	#---------------------------------------------------------------------------
+	#Logo will be displayed before each message!
+	logo: &b&lHide & Seek&7»
+	Mod: true
+	
+	#-----------------
+	#Messages
+	#-----------------
+
+on right click holding stone shovel:
+	if {toggle.hns} is true:
+		shoot snowball from player at speed 3
+		set metadata "stick" of last spawned snowball to true
+
+on damage:
+	if {toggle.hns} is true:
+		if projectile is snowball:
+			projectile exists
+			if victim is player:
+				teleport victim to {caught.hns}
+				remove 1 from {counter.hns}
+				broadcast "&4%victim% &ewas caught. %{counter.hns}% &eplayers remaining"
+				if {counter.hns} = 1:
+					broadcast "&4The Seeker Has won"
+					teleport {Seeker.hns} to {caught.hns}
+
+
+
+
+command /gamecreate [<text>]:
+	trigger:
+		if {toggle.hns} is true:
+			if arg 1 is not set:
+				message "&cPlease specify a Game name."
+			else:
+				add arg 1 to {HNS.Name::*}
+				message "&b&lSet &d&l%arg 1%&b&l as a Game."
+				set {counter.hns} to 0
+		else:
+			message "&4Hide And Seek Is Not Enabled"
+
+command /gamedelete [<text>]:
+	trigger:
+		if {toggle.hns} is true:
+			if arg 1 is not set:
+				message "&cPlease specify a Game name."
+			else:
+				remove arg 1 from {HNS.Name::*}
+				message "&c&lRemoved %arg 1% from the game List."
+				set {counter.hns} to 0
+				clear {Player.%arg 1%::*}
+				remove arg 1 from {Started.HNS::*}
+				message "&c%arg 1% is stopped."
+		else:
+			message "&4Hide And Seek Is Not Enabled"
+
+
+command /gamesetwarps [<text>] [<text>]:
+	trigger:
+		if {toggle.hns} is true:
+			if {HNS.Name::*} contain arg 1:
+				if arg 2 is "seeker":
+					set {seeker.hns} to location of player
+					message "&4Seeker Location Has Been Set"
+				if arg 2 is "hidden":
+					set {hidden.hns} to location of player
+					message "&4Hidders Location Has Been Set"
+				if arg 2 is "caught":
+					set {caught.hns} to location of player
+					message "&4Caught Location Has Been Set"
+			if {HNS.Name::*} does not contain arg 1:
+				message "&b&lGame Doesnt Exist"
+			if arg 1 is not set:
+				message "&cPlease specify a Game name."
+		else:
+			message "&4Hide And Seek Is Not Enabled"
+
+command /gamelist:
+	trigger:
+		if {toggle.hns} is true:
+			message "&c%{HNS.Name::*}%."
+		else:
+			message "&4Hide And Seek Is Not Enabled"
+
+command /gamejoin [<text>]:
+	trigger:
+		if {toggle.hns} is true:
+			if {Player.%arg 1%::*} does not contain player:
+				add player to {Player.%arg 1%::*}
+				message "&c(!) %player% joined %arg 1%."
+				add 1 to {counter.hns}
+			else:
+				message "&c(!) %player% already in game %arg 1%."
+		else:
+			message "&4Hide And Seek Is Not Enabled"
+
+
+command /gamewarps [<text>] [<text>]:
+	trigger:
+		if {toggle.hns} is true:
+			if {HNS.Name::*} contain arg 1:
+				if arg 2 is "seeker":
+					teleport player to {seeker.hns}
+					message "&4Seeker Location"
+				if arg 2 is "hidden":
+					teleport player to {hidden.hns}
+					message "&4Hidders Location"
+				if arg 2 is "caught":
+					teleport player to {caught.hns}
+					message "&4Caught Location"
+			if {HNS.Name::*} does not contain arg 1:
+				message "&b&lGame Doesnt Exist"
+			if arg 1 is not set:
+				message "&cPlease specify a Game name."
+		else:
+			message "&4Hide And Seek Is Not Enabled"
+
+command /gamestart [<text>]:
+	trigger:
+		if {toggle.hns} is true:
+			teleport {Player.%arg 1%::*} to {hidden.hns}
+			add arg 1 to {Started.HNS::*}
+			set {Seeker.hns} to random element out of {Player.%arg 1%::*}
+			teleport {Seeker.hns} to {seeker.hns}
+			give {Seeker.hns} 1 stone shovel
+			stop
+		else:
+			message "&4Hide And Seek Is Not Enabled"
+
+command /gamestop [<text>]:
+	trigger:
+		if {toggle.hns} is true:
+			clear {Player.%arg 1%::*}
+			remove arg 1 from {Started.HNS::*}
+			message "&c%arg 1% is stopped."
+		else:
+			message "&4Hide And Seek Is Not Enabled"
+
+command /gamesettings [<text>] [<text>]:
+	trigger:
+		if {toggle.hns} is true:
+			if {HNS.Name::*} contain arg 1:
+				if arg 2 is "seeker":
+					set {seeker.hns} to location of player
+					message "&4Seeker Location Has Been Set"
+				if arg 2 is "hidder":
+					set {hidden.hns} to location of player
+					message "&4Hidders Location Has Been Set"
+				if arg 2 is "caught":
+					set {caught.hns} to location of player
+					message "&4Caught Location Has Been Set"
+			if {HNS.Name::*} does not contain arg 1:
+				message "&b&lGame Doesnt Exist"
+			if arg 1 is not set:
+				message "&cPlease specify a Game name."
+		else:
+			message "&4Hide And Seek Is Not Enabled"
